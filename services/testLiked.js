@@ -15,7 +15,18 @@ const fetchLikedTracks = async () => {
 				},
 			}
 		)
-		return response.data
+
+		// Извлекаем треки из ответа
+		if (
+			response.data &&
+			response.data.result &&
+			response.data.result.library &&
+			response.data.result.library.tracks
+		) {
+			return response.data.result.library.tracks // Возвращаем массив треков
+		} else {
+			throw new Error('Неверная структура ответа API')
+		}
 	} catch (error) {
 		console.error('Ошибка получения треков "Мне нравится":', error)
 		throw error
@@ -25,10 +36,10 @@ const fetchLikedTracks = async () => {
 // Вызов функции для получения треков
 fetchLikedTracks()
 	.then(likedTracks => {
-		// Предположим, что likedTracks содержит массив треков в likedTracks.tracks
-		const tracks = likedTracks.tracks || [] // Путь до массива треков может отличаться
-		const trackNames = tracks.map(track => track.title) // Извлекаем названия треков
-		console.log('Названия треков "Мне нравится":', trackNames)
+		// likedTracks - это массив треков
+		const trackNames = likedTracks.map(track => track.id) // Получение ID треков
+		console.log('ID треков "Мне нравится":', trackNames)
+		// Если требуется извлекать какие-то другие атрибуты треков, вы можете сделать это здесь
 	})
 	.catch(error => {
 		console.error('Ошибка при получении треков:', error)
