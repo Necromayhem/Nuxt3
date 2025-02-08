@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// TODO: Вынести сюда компонент Track, разделив логику на компоненты
 const likedTracksStore = userLikedTracksStore()
 
 onMounted(() => {
@@ -9,7 +8,7 @@ onMounted(() => {
 
 <template>
 	<div class="p-1 border border-gray-100 rounded-md">
-		<h2 class="p-1 mb-2 text-lg font-bold">Понравившаяся музыка</h2>
+		<h2 class="p-1 mb-2 text-lg font-bold text-white">Понравившаяся музыка</h2>
 		<div
 			v-if="likedTracksStore.trackInfo.length"
 			class="flex flex-wrap gap-2 m-1"

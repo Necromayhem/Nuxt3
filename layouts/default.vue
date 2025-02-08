@@ -1,7 +1,8 @@
 <script setup>
-import { onBeforeMount } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import { useSongStore } from '@/stores/song'
 import { storeToRefs } from 'pinia'
+import { useRouter } from 'vue-router'
 
 import Magnify from 'vue-material-design-icons/Magnify.vue'
 import Bell from 'vue-material-design-icons/Bell.vue'
@@ -11,6 +12,20 @@ import SongLyrics from '@/components/SongLyrics.vue'
 
 const useSong = useSongStore()
 const { isPlaying, currentTrack, isLyrics, trackTime } = storeToRefs(useSong)
+const router = useRouter()
+
+const trackId = ref('')
+
+const handleKeyPress = event => {
+	if (event.key === 'Enter') {
+		const trimmedTrackId = trackId.value.trim()
+		if (trimmedTrackId) {
+			router.push(`/favourite?id=${trimmedTrackId}`) // Переводим на страницу избранного
+		} else {
+			alert('Введите ID трека для перехода!')
+		}
+	}
+}
 
 onBeforeMount(() => {
 	isPlaying.value = false
@@ -27,6 +42,8 @@ onBeforeMount(() => {
 		<div class="flex items-center w-full">
 			<Magnify class="pl-6 mt-1 pr-2" fillColor="#7E7E88" :size="22" />
 			<input
+				v-model="trackId"
+				@keyup="handleKeyPress"
 				class="p-1 bg-transparent outline-none font-[300] placeholder-[#BEBEC7] text-[#FFFFFF] w-full max-w-xl"
 				placeholder="Search"
 				type="text"
@@ -93,7 +110,6 @@ onBeforeMount(() => {
 	</div>
 
 	<MusicPlayer v-if="currentTrack" />
-
 	<SongLyrics
 		v-if="isLyrics"
 		:class="{
