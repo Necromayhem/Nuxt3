@@ -1,11 +1,11 @@
-const crypto = require('node:crypto')
-const axios = require('axios')
-const { createError, defineEventHandler } = require('h3')
+import crypto from 'node:crypto'
+import axios from 'axios'
+import { createError, defineEventHandler } from 'h3'
 
-module.exports = defineEventHandler(async event => {
+export default defineEventHandler(async (event) => {
 	const config = useRuntimeConfig()
 	const baseUrl = 'https://api.music.yandex.net:443'
-	const token = 'y0__xDqvKLtBhje-AYg_IbYmRKvzgUtTWneOYnXr6Gw6ZRXFVRotw'
+	const token = config.yandexMusicToken
 
 	const trackId = event.context.params?.trackId
 
@@ -17,15 +17,12 @@ module.exports = defineEventHandler(async event => {
 	}
 
 	try {
-		const trackResponse = await axios.get(
-			`${baseUrl}/tracks/${trackId}/download-info`,
-			{
-				headers: {
-					Authorization: `OAuth ${token}`,
-					'Accept-Language': 'ru',
-				},
-			}
-		)
+		const trackResponse = await axios.get(`${baseUrl}/tracks/${trackId}/download-info`, {
+			headers: {
+				'Authorization': `OAuth ${token}`,
+				'Accept-Language': 'ru',
+			},
+		})
 
 		const trackInfo = trackResponse.data.result
 		if (!trackInfo || trackInfo.length === 0) {
@@ -35,9 +32,9 @@ module.exports = defineEventHandler(async event => {
 			})
 		}
 
-		const selectedInfo =
-			trackInfo.find(item => item.codec === 'mp3' && !item.preview) ||
-			trackInfo[0]
+		const selectedInfo = trackInfo.find(
+			(item: any) => item.codec === 'mp3' && !item.preview,
+		) || trackInfo[0]
 
 		if (!selectedInfo || !selectedInfo.downloadInfoUrl) {
 			throw createError({
@@ -46,18 +43,15 @@ module.exports = defineEventHandler(async event => {
 			})
 		}
 
-		const downloadResponse = await axios.get(
-			`${selectedInfo.downloadInfoUrl}&format=json`,
-			{
-				headers: {
-					Authorization: `OAuth ${token}`,
-				},
-			}
-		)
+		const downloadResponse = await axios.get(`${selectedInfo.downloadInfoUrl}&format=json`, {
+			headers: {
+				Authorization: `OAuth ${token}`,
+			},
+		})
 
 		const { s, ts, path, host } = downloadResponse.data
 
-		/* NOTE: Алгоритм для хэширования и создания ссылки */
+		/* NOTE: АЛГОРИТМ РАЗКЕШИРОВАНИЯ MD5 */
 		if (!s || !ts || !path || !host) {
 			throw createError({
 				statusCode: 500,
@@ -65,13 +59,13 @@ module.exports = defineEventHandler(async event => {
 			})
 		}
 
-		// Алгоритм формирования ссылки
 		const trackUrl = `XGRlBW9FXlekgbPrRHuSiA${path.substr(1)}${s}`
 		const hashedUrl = crypto.createHash('md5').update(trackUrl).digest('hex')
 		const downloadLink = `https://${host}/get-mp3/${hashedUrl}/${ts}${path}`
 
 		return { downloadLink }
-	} catch (error) {
+	}
+	catch (error: any) {
 		console.error('Error fetching track data:', error.message || error)
 		throw createError({
 			statusCode: 500,

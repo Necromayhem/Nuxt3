@@ -1,10 +1,10 @@
-const { createError, defineEventHandler } = require('h3')
+import { createError, defineEventHandler } from 'h3'
 
-module.exports = defineEventHandler(async () => {
+export default defineEventHandler(async () => {
 	const config = useRuntimeConfig()
-	const userId = '1839767146'
+	const userId = '1296937379'
 	const baseUrl = 'https://api.music.yandex.net:443'
-	const token = 'y0__xDqvKLtBhje-AYg_IbYmRKvzgUtTWneOYnXr6Gw6ZRXFVRotw'
+	const token = config.yandexMusicToken
 
 	const cacheKey = `yandex-music:user-${userId}-likes`
 
@@ -19,12 +19,13 @@ module.exports = defineEventHandler(async () => {
 		const response = await $fetch(`${baseUrl}/tracks/${userId}`, {
 			method: 'GET',
 			headers: {
-				Authorization: `OAuth ${token}`,
+				'Authorization': `OAuth ${token}`,
 				'Accept-Language': 'ru',
 			},
 		})
 		return response
-	} catch (error) {
+	}
+	catch (error) {
 		console.error('Error fetching data:', error)
 		throw createError({
 			statusCode: 500,

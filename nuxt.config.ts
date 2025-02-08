@@ -1,17 +1,13 @@
 export default defineNuxtConfig({
 	devtools: { enabled: true },
-	// runtimeConfig: {
-	// 	yandexMusicToken: process.env.YANDEX_MUSIC_TOKEN || '', // Подключаем через переменную окружения
-	// },
+	runtimeConfig: {
+		yandexMusicToken: process.env.YANDEX_MUSIC_TOKEN || '', // Подключаем через переменную окружения
+	},
 
 	// Подключение Tailwind CSS
 	css: ['~/assets/css/main.css'],
 
-	modules: [
-		'@nuxtjs/tailwindcss',
-		'@pinia/nuxt',
-		// '@nuxtjs/i18n', // Добавить, если нужен i18n
-	],
+	modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
 
 	app: {
 		head: {
